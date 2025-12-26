@@ -48,10 +48,11 @@ function! s:diff_with_ctx(bang, buf) abort
   call s:do_diff(a:buf)
 endfunction
 
+let s:contexts = {}
 let s:auto_diff = v:false
 function! s:qf_diff(qfid) abort
   let buf = bufnr()
-  let diffs = s:context.items[s:qf_idx(a:qfid)-1].diff
+  let diffs = s:contexts[a:qfid].items[s:qf_idx(a:qfid)-1].diff
   if len(diffs) == 0
     return
   endif
@@ -89,8 +90,8 @@ function! qfugitive#main() abort
   if stridx(module, ":2:") >=0 || stridx(module, ":3:") >=0
     return 
   endif
-  let s:context = qflist.context
   let qfid = qflist.id
+  let s:contexts[qfid] = qflist.context
   exec printf("augroup qfugitive:autodiff:qfid:%s", qfid)
   exec "autocmd!"
   for idx in range(0, len(items)-1)
