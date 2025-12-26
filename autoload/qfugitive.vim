@@ -40,10 +40,12 @@ function! s:diff_with_ctx(bang, buf) abort
   if a:bang && (s:auto_diff || s:is_current_diffbuf_showed(a:buf))
     let s:auto_diff = v:false
     exec printf("bdel %s", s:get_diffbuf(a:buf))
+    echo 'Auto diff: OFF'
     return
   endif
   if a:bang
     let s:auto_diff = v:true
+    echo 'Auto diff: ON'
   endif
   call s:do_diff(a:buf)
 endfunction
@@ -59,9 +61,13 @@ function! s:qf_diff(qfid) abort
   let diff = diffs[0]
   call setbufvar(buf, "diff_filename", diff.filename)
 
-  command! -bang -buffer GDiffWithCtx call s:diff_with_ctx(<bang>0, bufnr())
-  nnoremap <buffer> \d <cmd>GDiffWithCtx<cr>
-  nnoremap <buffer> \D <cmd>GDiffWithCtx!<cr>
+  " Only setup once per buffer
+  if !exists('b:qfugitive_setup')
+    let b:qfugitive_setup = 1
+    command! -bang -buffer GDiffWithCtx call s:diff_with_ctx(<bang>0, bufnr())
+    nnoremap <buffer> \d <cmd>GDiffWithCtx<cr>
+    nnoremap <buffer> \D <cmd>GDiffWithCtx!<cr>
+  endif
 
   if !s:is_qfwin_opened() || !s:current_qfid_equal(a:qfid)
     return
