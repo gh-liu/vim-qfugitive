@@ -18,7 +18,7 @@ function s:is_current_diffbuf_showed(buf) abort
   let bufnrs = tabpagebuflist()
   let diff_buf = s:get_diffbuf(a:buf)
   if diff_buf > 0 && bufloaded(diff_buf)
-    return len(filter(bufnrs, "v:val == ".diff_buf)) > 0
+    return index(bufnrs, diff_buf) >= 0
   endif
   return v:false
 endfunction
